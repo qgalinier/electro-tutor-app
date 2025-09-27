@@ -1,0 +1,10 @@
+# Entorno y secretos
+.env
+
+# Archivos compilados de Python
+__pycache__/
+*.pyc
+
+# Dependencias (si usaras un entorno virtual aquí)
+.venv/
+venv/

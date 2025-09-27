@@ -1,0 +1,161 @@
+timestamp,rating,comment,topic,question,response
+2025-09-09T16:06:38.518672,5,,desconocido,"HOla, que es una fuerza electrica","¡Hola! La fuerza eléctrica es una fuerza de interacción que actúa entre dos objetos con cargas eléctricas. Según la Ley de Coulomb, la magnitud de la fuerza eléctrica entre dos cargas puntuales 
+𝑞
+1
+ y 
+𝑞
+2
+ separadas por una distancia 
+𝑟
+ en el vacío está dada por la siguiente fórmula:
+
+
+𝐹
+=
+𝑘
+⋅
+|
+𝑞
+1
+|
+⋅
+|
+𝑞
+2
+|
+𝑟
+2
+
+
+Donde:
+- 
+𝐹
+ es la magnitud de la fuerza eléctrica,
+- 
+𝑘
+ es la constante de Coulomb (
+8.9875
+×
+10
+9
+N m
+2
+/
+C
+2
+),
+- 
+𝑞
+1
+ y 
+𝑞
+2
+ son las magnitudes de las cargas,
+- 
+𝑟
+ es la distancia entre las cargas.
+
+La fuerza eléctrica puede ser atractiva (si las cargas son de signos opuestos) o repulsiva (si las cargas tienen el mismo signo)."
+2025-09-09T16:07:16.099005,4,,desconocido,En inglés,"The electric force is an interaction force that acts between two objects with electric charges. According to Coulomb's Law, the magnitude of the electric force between two point charges 
+𝑞
+1
+ and 
+𝑞
+2
+ separated by a distance 
+𝑟
+ in a vacuum is given by the following formula:
+
+
+𝐹
+=
+𝑘
+⋅
+|
+𝑞
+1
+|
+⋅
+|
+𝑞
+2
+|
+𝑟
+2
+
+
+Where:
+- 
+𝐹
+ is the magnitude of the electric force,
+- 
+𝑘
+ is the Coulomb constant (
+8.9875
+×
+10
+9
+N m
+2
+/
+C
+2
+),
+- 
+𝑞
+1
+ and 
+𝑞
+2
+ are the magnitudes of the charges,
+- 
+𝑟
+ is the distance between the charges.
+
+The electric force can be attractive (if the charges have opposite signs) or repulsive (if the charges have the same sign)."
+2025-09-10T20:41:38.424651,5,,desconocido,¿Cómo funciona un dipolo eléctrico?,"Un dipolo eléctrico consiste en dos cargas de igual magnitud pero de signos opuestos separadas por una distancia. Cuando se coloca un dipolo eléctrico en un campo eléctrico externo, experimentará un par de fuerzas que tienden a alinear el dipolo con el campo.
+
+El momento dipolar eléctrico (
+𝑝
+→
+) de un dipolo se define como el producto de la magnitud de una de las cargas (
+𝑞
+) por la distancia entre las cargas (
+𝑑
+), y está dirigido desde la carga negativa hacia la positiva. Matemáticamente, se expresa como:
+
+
+𝑝
+→
+=
+𝑞
+⋅
+𝑑
+→
+
+
+Donde 
+𝑑
+→
+ es el vector que apunta desde la carga negativa hacia la positiva.
+
+En presencia de un campo eléctrico externo 
+𝐸
+→
+, un dipolo eléctrico experimentará un torque dado por:
+
+
+𝜏
+→
+=
+𝑝
+→
+×
+𝐸
+→
+
+
+Este torque tiende a alinear el dipolo con el campo eléctrico externo. Cuando el dipolo está alineado con el campo, se encuentra en un estado de menor energía potencial. Por otro lado, si el dipolo está orientado en dirección opuesta al campo, estará en un estado de mayor energía potencial.
+
+En resumen, un dipolo eléctrico interactúa con un campo eléctrico externo mediante la orientación de sus cargas para minimizar su energía potencial, lo que resulta en un movimiento rotacional alineando el dipolo con el campo."
+2025-09-10T20:49:14.307944,2,No es una buena respuesta,desconocido,Tengo una duda de biología,"¡Claro! Estoy especializado en temas de física, especialmente en electromagnetismo. Si tienes alguna pregunta relacionada con este tema, estaré encantado de ayudarte. ¡Adelante!"

@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tutor de Electromagnetismo</title>
+    <link rel="stylesheet" href="styles.css">
+     <script>
+        MathJax = {
+          tex: {
+            inlineMath: [['$', '$'], ['\\(', '\\)']],
+            displayMath: [['$$', '$$'], ['\\[', '\\]']]
+          },
+          svg: {
+            fontCache: 'global'
+          }
+        };
+    </script>
+    <script type="text/javascript" id="MathJax-script" async
+      src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js">
+    </script>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🔌 Tutor de Electromagnetismo</h1>
+            <p class="subtitle">Tu asistente especializado en física electromagnética</p>
+        </header>
+        
+        <main>
+            <div class="chat-container" id="chatContainer">
+                <div class="welcome-message">
+                    <div class="bot-avatar">🤖</div>
+                    <div class="message-content">
+                        <p>¡Hola! Soy tu tutor de electromagnetismo. Pregúntame sobre:</p>
+                        <ul>
+                            <li>Campos eléctricos y magnéticos</li>
+                            <li>Ley de Coulomb y Ley de Gauss</li>
+                            <li>Ley de Faraday y Ley de Ampère</li>
+                            <li>Ecuaciones de Maxwell</li>
+                            <li>Ondas electromagnéticas</li>
+                            <li>Problemas paso a paso</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="input-section">
+                <div class="input-container">
+                    <textarea 
+                        id="questionInput" 
+                        placeholder="Escribe tu pregunta sobre electromagnetismo..."
+                        rows="1"
+                    ></textarea>
+                    <button id="sendButton" type="button">
+                        <span id="buttonText">Enviar</span>
+                        <span id="buttonLoader" class="loader hidden">⏳</span>
+                    </button>
+                </div>
+                
+                <div class="suggestions" id="suggestions">
+                    <div class="suggestion-chip" data-question="¿Qué es un campo eléctrico?">
+                        ¿Qué es un campo eléctrico?
+                    </div>
+                    <div class="suggestion-chip" data-question="Explica la ley de Coulomb">
+                        Explica la ley de Coulomb
+                    </div>
+                    <div class="suggestion-chip" data-question="¿Cómo funciona un dipolo eléctrico?">
+                        ¿Cómo funciona un dipolo eléctrico?
+                    </div>
+                </div>
+            </div>
+        </main>
+        
+        <footer>
+            <div class="status" id="status">
+                <span class="status-indicator"></span>
+                <span class="status-text">Listo para ayudarte</span>
+            </div>
+        </footer>
+    </div>
+    
+    <!-- Error Modal -->
+    <div class="modal hidden" id="errorModal">
+        <div class="modal-content">
+            <h3>⚠️ Error de Conexión</h3>
+            <p id="errorMessage">Hubo un problema al procesar tu solicitud.</p>
+            <button id="closeModal" class="modal-button">Entendido</button>
+        </div>
+    </div>
+    
+    <script src="script.js"></script>
+</body>
+</html>
