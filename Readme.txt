@@ -1,8 +1,8 @@
-# Electro-Tutor 
+# Electro-Tutor
 
 ## Descripción
 Electro-Tutor es un asistente de chat interactivo diseñado para ayudar a estudiantes y entusiastas a comprender conceptos de física y electricidad. Utilizando un modelo de lenguaje avanzado, ofrece explicaciones claras, resuelve dudas y proporciona feedback sobre el aprendizaje. La aplicación consta de un frontend web moderno y responsivo, y un backend robusto construido con Flask.
-Una cantidad considerable del código aquí mostrado fue generado utilizando otros LLM's especializados y dirigidos a la programación. Claude, Gemini, ChatGPT. 
+Una cantidad considerable del código aquí mostrado fue generado utilizando otros LLM's especializados y dirigidos a la programación. Claude, Gemini, ChatGPT.
 
 ## Características
 * **Chat Interactivo:** Conversaciones dinámicas sobre temas de electricidad y física.
@@ -10,25 +10,23 @@ Una cantidad considerable del código aquí mostrado fue generado utilizando otr
 * **Feedback de Usuario:** Sistema de calificación por estrellas y comentarios para mejorar las respuestas del tutor.
 * **Diseño Responsivo:** Experiencia de usuario fluida en dispositivos de escritorio y móviles.
 
-
 ## Estructura del Proyecto
-
 
 ELECTRO-TUTOR/
 ├── back-end/
-│   ├── fine-tuning-data/  # Notebooks para fine-tuning del modelo
-│   ├── .env               # Variables de entorno para el backend (ej. API_KEY)
-│   └── app.py             # Lógica del servidor Flask
-│   └── feedback.csv       # Almacenamiento de feedback de usuario
+│   ├── fine-tuning-data/    # Notebooks para fine-tuning del modelo
+│   ├── .env                 # Variables de entorno para el backend (ej. API_KEY)
+│   ├── app.py               # Lógica del servidor Flask
+│   └── feedback.csv         # Almacenamiento de feedback de usuario
 ├── front-end/
-│   ├── index.html         # Interfaz de usuario principal
-│   ├── script.js          # Lógica del frontend (interacción, llamadas API)
-│   ├── styles.css         # Estilos CSS de la aplicación
-│   └── sw.js              # Service Worker (para PWA/offline caching)
-├── requirements.txt       # Dependencias de Python para el backend
-├── vercel.json            # Configuración de despliegue para Vercel
-└── README.md              # Este archivo
-└── .gitignore             # Archivos y carpetas a ignorar por Git
+│   ├── index.html           # Interfaz de usuario principal
+│   ├── script.js            # Lógica del frontend (interacción, llamadas API)
+│   ├── styles.css           # Estilos CSS de la aplicación
+│   └── sw.js                # Service Worker (para PWA/offline caching)
+├── requirements.txt         # Dependencias de Python para el backend
+├── vercel.json              # Configuración de despliegue para Vercel
+└── README.md                # Este archivo
+└── .gitignore               # Archivos y carpetas a ignorar por Git
 
 ## Requisitos
 
@@ -80,7 +78,6 @@ Para desplegar tu aplicación en Vercel:
 
 1.  **Sube tu proyecto a GitHub:**
     Asegúrate de que todo tu código esté en un repositorio de GitHub.
-
     ```bash
     git init
     git add .
