@@ -1,10 +1,19 @@
-# Entorno y secretos
-.env
-
-# Archivos compilados de Python
+# Python
 __pycache__/
 *.pyc
-
-# Dependencias (si usaras un entorno virtual aquí)
-.venv/
+*.pyo
+*.pyd
+.Python/
+env/
 venv/
+.venv/
+
+# Variables de entorno
+back-end/.env
+
+# Archivos específicos del OS
+.DS_Store
+Thumbs.db
+
+# Archivos de Vercel
+.vercel/

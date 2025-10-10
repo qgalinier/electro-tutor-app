@@ -35,89 +35,67 @@ if not openai.api_key:
     logger.info("Crea un archivo .env con: OPENAI_API_KEY=sk-tu-api-key-aqui")
 
 # Prompt del sistema para el tutor de electromagnetismo
-SYSTEM_PROMPT = """Eres un profesor de física especializado en Electromagnetismo. Por defecto, proporciona respuestas claras y concisas. Si el usuario solicita una explicación detallada, muestra confusión (por ejemplo, preguntas básicas o errores conceptuales), o pide un desglose paso a paso, adopta un enfoque paciente y pedagógico. Rechaza amablemente los temas que no estén relacionados con Electromagnetismo.
+SYSTEM_PROMPT = """Eres un tutor experto en Electromagnetismo, basado en el libro "Physics for Scientists and Engineers" de Knight. Tu única misión es guiar a los estudiantes usando el método socrático.
 
-Características de tus respuestas:
-- Usa LaTeX para fórmulas matemáticas cuando sea necesario
-- Proporciona explicaciones paso a paso para problemas complejos
-- Incluye ejemplos prácticos cuando sea útil
-- Mantén un tono pedagógico y amigable
-- Si la pregunta no es sobre electromagnetismo, redirige amablemente al tema
+**Tu Regla de Oro Absoluta: NUNCA des la respuesta directa a una pregunta conceptual o de resolución de problemas. Tu respuesta SIEMPRE debe ser otra pregunta que guíe al estudiante a pensar.**
 
-Temas que puedes cubrir:
-- Ley de Coulomb y fuerzas eléctricas
-- Campos eléctricos y potencial eléctrico
-- Ley de Gauss
-- Capacitores y dieléctricos
-- Corriente y resistencia
-- Campos magnéticos
-- Ley de Faraday e inducción electromagnética
-- Ley de Ampère
-- Ecuaciones de Maxwell
-- Ondas electromagnéticas"""
+**Directrices de Comportamiento:**
+1.  **Pregunta, no respondas:** Ante una pregunta del estudiante, formula una contra-pregunta que lo ayude a conectar con conocimientos previos, a descomponer el problema, o a reflexionar sobre un concepto clave.
+2.  **Mantén un tono de apoyo:** Sé paciente, amable y alentador. Usa frases como "¡Excelente pregunta!", "Vamos a pensarlo juntos...", "Estás muy cerca de la idea...".
+3.  **Dominio Estricto:** Rechaza de forma breve y amable cualquier pregunta que no sea de electromagnetismo. Tu conocimiento se limita a este campo.
+4.  **Uso de LaTeX:** Incorpora notación matemática en formato LaTeX cuando sea necesario para formular tus preguntas guía.
 
+**Ejemplo de tu comportamiento:**
+- **NO DEBES HACER ESTO:**
+  - *Usuario:* "¿Qué es la Ley de Gauss?"
+  - *Tú:* "La Ley de Gauss dice que el flujo eléctrico a través de una superficie cerrada es proporcional a la carga encerrada."
+
+- **SÍ DEBES HACER ESTO:**
+  - *Usuario:* "¿Qué es la Ley de Gauss?"
+  - *Tú:* "¡Una ley fundamental! Antes de escribir la ecuación, ¿podrías explicar con tus propias palabras qué es lo que relaciona la Ley de Gauss? ¿Qué dos cantidades físicas conecta?"
+"""
+
+# --- El cerebro de nuestro Tutor ---
 class ElectromagnetismTutor:
     def __init__(self):
         self.conversation_history = []
-    
+        # --- ¡CAMBIO CLAVE AQUÍ! ---
+        # Creamos una instancia del cliente de OpenAI al inicializar el tutor.
+        # Esto es necesario para las versiones recientes (1.x.x en adelante) de la librería de OpenAI.
+        self.openai_client = openai.OpenAI(api_key=os.getenv('OPENAI_API_KEY'))
+
+
     def get_response(self, user_question):
-        """
-        Obtiene respuesta del modelo de OpenAI para la pregunta del usuario
-        """
         try:
-            # Verificar API key
-            if not openai.api_key:
-                return "Error: API key de OpenAI no configurada. Verifica el archivo .env"
-            
-            # Agregar el mensaje del usuario al historial
-            self.conversation_history.append({
-                "role": "user", 
-                "content": user_question
-            })
-            
-            # Preparar los mensajes para la API
+            # Preparamos el historial y los mensajes
+            self.conversation_history.append({"role": "user", "content": user_question})
             messages = [{"role": "system", "content": SYSTEM_PROMPT}]
-            
-            # Mantener solo los últimos 10 intercambios para no exceder límites
-            recent_history = self.conversation_history[-20:]  # 20 mensajes = ~10 intercambios
-            messages.extend(recent_history)
-            
-            # Llamada a la API de OpenAI usando la nueva sintaxis
-            response = openai.ChatCompletion.create(
-                model="gpt-3.5-turbo",  # o "gpt-4" si tienes acceso
+            messages.extend(self.conversation_history[-20:])
+
+            # Realizamos la llamada a la API de OpenAI
+            # y guardamos el resultado en la variable 'response'
+            response = self.openai_client.chat.completions.create(
+                model="ft:gpt-4o-2024-08-06:personal:tutor-electro-v1:COp6sgDQ",  # <-- PEGA AQUÍ EL ID DE TU MODELO FINE-TUNED
                 messages=messages,
                 max_tokens=1500,
-                temperature=0.7,
-                top_p=0.9,
-                frequency_penalty=0.1,
-                presence_penalty=0.1
+                temperature=0.9
             )
-            
-            # Extraer la respuesta del asistente
+
+            # Extraemos el contenido usando la misma variable 'response'
             assistant_response = response.choices[0].message.content
-            
-            # Agregar la respuesta al historial
-            self.conversation_history.append({
-                "role": "assistant",
-                "content": assistant_response
-            })
+
+            # Guardamos la respuesta en el historial
+            self.conversation_history.append({"role": "assistant", "content": assistant_response})
             
             return assistant_response
-            
-        except openai.error.AuthenticationError as e:
-            logger.error(f"Error de autenticación OpenAI: {str(e)}")
-            return "Error de configuración: API key de OpenAI inválida. Verifica tu configuración."
-        except openai.error.RateLimitError as e:
-            logger.error(f"Rate limit excedido: {str(e)}")
-            return "Lo siento, se ha excedido el límite de consultas. Intenta de nuevo en unos minutos."
-        except openai.error.APIError as e:
-            logger.error(f"Error de API OpenAI: {str(e)}")
-            return "Lo siento, hubo un problema con el servicio de IA. Intenta de nuevo."
-        except Exception as e:
-            logger.error(f"Error inesperado: {str(e)}")
-            return "Lo siento, hubo un error procesando tu pregunta. Por favor, intenta de nuevo."
 
-# Instancia global del tutor
+        except openai.APIError as e:
+            logger.error(f"Error de la API de OpenAI: {e}")
+            return f"Lo siento, hubo un problema con el servicio de IA. Intenta de nuevo más tarde."
+        except Exception as e:
+            logger.error(f"Error inesperado al llamar a OpenAI: {str(e)}")
+            return "Lo siento, mi cerebro de IA está un poco cansado. ¿Podrías intentar de nuevo?"
+
 tutor = ElectromagnetismTutor()
 
 @app.route('/', methods=['GET'])
