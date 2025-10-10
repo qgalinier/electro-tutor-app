@@ -1,9 +1,10 @@
 // declaramos variables para el desarrollo local, en este caso 2 endpoints, api y health 
 const CONFIG = {
-    API_ENDPOINT: 'http://127.0.0.1:5000/api/chat',
-    HEALTH_ENDPOINT: 'http://127.0.0.1:5000/api/health',
-    // nuevo endpoint para checar si funciona el metodo de evaluacion de respuesta
-    FEEDBACK_ENDPOINT: 'http://127.0.0.1:5000/api/feedback', 
+    // Las URLs ahora son relativas al dominio en el que se sirve el frontend.
+    // Vercel se encargará de dirigir /api/chat a tu backend Flask.
+    API_ENDPOINT: '/api/chat',
+    HEALTH_ENDPOINT: '/api/health',
+    FEEDBACK_ENDPOINT: '/api/feedback', 
     // definimos un maximo de reintentos y un delay entre cada uno
     MAX_RETRIES: 3,
     RETRY_DELAY: 1000
