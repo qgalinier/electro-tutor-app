@@ -1,5 +1,5 @@
-Flask==3.0.3
-Flask-CORS==4.0.1
-openai>=1.0.0,<2.0.0
+flask==3.0.3
+flask-cors==4.0.1
+openai<2.0.0,>=1.0.0
 python-dotenv==1.0.1
-supabase-py>=2.3.5
+supabase==2.3.5
