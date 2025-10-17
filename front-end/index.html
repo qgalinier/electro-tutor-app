@@ -21,16 +21,15 @@
     </script>
 </head>
 <body>
-    <div class="container">
+    <div class="container" id="mainContainer">
         <header>
-            <h1> Tutor de Electromagnetismo 🔌</h1>
-            <p class="subtitle">Tu asistente especializado en física electromagnética. El presente 
-proyecto es una iniciativa educativa y no comercial. Utiliza el Knight edición 4.
-            </p>
+            <h1> Tutor de Electromagnetismo </h1>
+            <p class="subtitle">Tu asistente especializado en física electromagnética. Basado en "Physics for Scientists and Engineers" de Knight, 4ta Edición.</p>
         </header>
         
         <main>
             <div class="chat-container" id="chatContainer">
+                <!-- Los mensajes del chat se insertarán aquí dinámicamente -->
             </div>
             
             <div class="input-section">
@@ -42,7 +41,7 @@ proyecto es una iniciativa educativa y no comercial. Utiliza el Knight edición 
                     ></textarea>
                     <button id="sendButton" type="button">
                         <span id="buttonText">Enviar</span>
-                        <span id="buttonLoader" class="loader hidden"></span>
+                        <span id="buttonLoader" class="button-loader hidden"></span>
                     </button>
                 </div>
                 
@@ -68,23 +67,27 @@ proyecto es una iniciativa educativa y no comercial. Utiliza el Knight edición 
         </footer>
     </div>
 
-    <div class="modal hidden" id="errorModal">
+    <!-- Modal para Errores Generales -->
+    <div class="modal-overlay" id="errorModal">
         <div class="modal-content">
+            <button class="close-modal-btn" id="closeModalBtn">&times;</button>
             <h3>Error de Conexión</h3>
             <p id="errorMessage">Hubo un problema al procesar tu solicitud.</p>
-            <button id="closeModal" class="modal-button">Entendido</button>
         </div>
     </div>
-    <div class="modal" id="accessModal" style="display: flex;">
+
+    <!-- Modal para la Clave de Acceso (MEJORADO) -->
+    <div class="modal-overlay visible" id="accessModal">
         <div class="modal-content">
-            <h3>Clave de Acceso</h3>
-            <p>Por favor, introduce tu clave para iniciar la sesión.</p>
-            <input type="password" id="accessKeyInput" placeholder="Escribe tu clave aquí..." style="width: 80%; padding: 10px; margin-bottom: 15px; border-radius: 5px; border: 1px solid #ccc;">
-            <p id="accessError" style="color: red; display: none; margin-top: 0;"></p>
-            <button id="submitAccessKey" class="modal-button" style="margin-top: 10px;">Entrar</button>
+            <h3>Bienvenido al Tutor</h3>
+            <p>Por favor, introduce tu clave de acceso para iniciar.</p>
+            <input type="password" id="accessKeyInput" class="modal-input" placeholder="Clave de Acceso">
+            <p id="accessError" class="error-message"></p>
+            <button id="submitAccessKey" class="modal-button">Entrar</button>
         </div>
     </div>
     
     <script src="script.js"></script>
 </body>
 </html>
+
