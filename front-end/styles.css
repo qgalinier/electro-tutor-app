@@ -31,6 +31,13 @@ body {
     flex-grow: 1;
     display: flex;
     flex-direction: column;
+    transition: filter 0.3s ease-in-out;
+}
+
+body.modal-open .container {
+    filter: blur(5px);
+    pointer-events: none;
+    user-select: none;
 }
 
 header {
@@ -269,104 +276,6 @@ header h1 {
     background-color: var(--white);
 }
 
-.error-modal {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background-color: rgba(0, 0, 0, 0.6);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    z-index: 2000;
-}
-
-.modal-content {
-    background-color: var(--white);
-    padding: 2rem;
-    border-radius: 0.75rem;
-    box-shadow: var(--shadow-medium);
-    text-align: center;
-    max-width: 400px;
-    position: relative;
-}
-
-.close-modal-btn {
-    position: absolute;
-    top: 0.75rem;
-    right: 0.75rem;
-    background: none;
-    border: none;
-    font-size: 1.5rem;
-    cursor: pointer;
-    color: var(--text-color-light);
-}
-
-.close-modal-btn:hover {
-    color: var(--text-color-dark);
-}
-
-.error-modal-icon {
-    font-size: 3rem;
-    color: var(--error-color);
-    margin-bottom: 1rem;
-}
-
-/* MathJax Styles - Simplified for better flow */
-.message-bubble mjx-container {
-    display: inline-block;
-    vertical-align: -0.125em; /* Ajusta alineación vertical */
-    margin-left: 0.1em;
-    margin-right: 0.1em;
-    max-width: 100%;
-    overflow-x: auto; /* Mantener la funcionalidad de scroll si es necesario */
-    -webkit-overflow-scrolling: touch; /* Scroll suave en iOS */
-
-    /* Ocultar scrollbar para Chrome, Safari y Opera */
-    &::-webkit-scrollbar {
-        height: 0px; /* Ancho del scrollbar (oculto) */
-        background: transparent; /* Fondo transparente */
-    }
-    /* Ocultar scrollbar para Firefox */
-    scrollbar-width: none;
-    /* Ocultar scrollbar para IE y Edge */
-    -ms-overflow-style: none; 
-}
-
-/* Reglas específicas para ecuaciones de bloque (display mode) */
-.message-bubble mjx-container[display="true"] {
-    display: block;
-    margin: 0.5em 0;
-    text-align: center;
-    max-width: 100%;
-    overflow-x: auto;
-    -webkit-overflow-scrolling: touch;
-
-    /* Ocultar scrollbar para Chrome, Safari y Opera */
-    &::-webkit-scrollbar {
-        height: 0px; /* Ancho del scrollbar (oculto) */
-        background: transparent; /* Fondo transparente */
-    }
-    /* Ocultar scrollbar para Firefox */
-    scrollbar-width: none;
-    /* Ocultar scrollbar para IE y Edge */
-    -ms-overflow-style: none; 
-}
-
-/* Estilos para el propio Math (dentro del contenedor, si es necesario) */
-.message-bubble mjx-assistive-mml {
-    clip: rect(1px, 1px, 1px, 1px);
-    clip-path: inset(50%);
-    height: 1px;
-    width: 1px;
-    margin: -1px;
-    overflow: hidden;
-    padding: 0;
-    position: absolute;
-}
-
-
 .message-content-wrapper {
     display: flex;
     flex-direction: column;
@@ -389,7 +298,6 @@ header h1 {
     margin-bottom: 0.25rem;
 }
 
-/* Star Rating Styles */
 .star-rating {
     display: flex;
     flex-direction: row;
@@ -449,7 +357,99 @@ header h1 {
     background-color: var(--secondary-color);
 }
 
-/* Media Queries (Responsive Design) */
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    z-index: 2000;
+    backdrop-filter: blur(5px);
+    opacity: 0;
+    transition: opacity 0.3s ease-in-out;
+    pointer-events: none;
+}
+
+.modal-overlay.visible {
+    display: flex;
+    opacity: 1;
+    pointer-events: auto;
+}
+
+.modal-content {
+    background-color: var(--white);
+    padding: 2rem;
+    border-radius: 0.75rem;
+    box-shadow: var(--shadow-medium);
+    text-align: center;
+    max-width: 400px;
+    width: 90%;
+    position: relative;
+    transform: scale(0.95);
+    transition: transform 0.3s ease-in-out;
+}
+
+.modal-overlay.visible .modal-content {
+    transform: scale(1);
+}
+
+.modal-content h3 {
+    margin-top: 0;
+    color: var(--primary-color);
+}
+
+.modal-input {
+    width: 100%;
+    padding: 0.75rem;
+    margin-bottom: 1rem;
+    border: 1px solid var(--border-color);
+    border-radius: 0.5rem;
+    box-sizing: border-box;
+    font-size: 1rem;
+}
+
+.modal-button {
+    background-color: var(--primary-color);
+    color: var(--white);
+    border: none;
+    border-radius: 0.5rem;
+    padding: 0.75rem 1.5rem;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+}
+
+.modal-button:hover {
+    background-color: var(--secondary-color);
+}
+
+.error-message {
+    color: var(--error-color);
+    margin-top: -0.5rem;
+    margin-bottom: 1rem;
+    font-size: 0.9em;
+    min-height: 1.2em;
+}
+
+.close-modal-btn {
+    position: absolute;
+    top: 0.75rem;
+    right: 0.75rem;
+    background: none;
+    border: none;
+    font-size: 1.5rem;
+    cursor: pointer;
+    color: var(--text-color-light);
+}
+
+.close-modal-btn:hover {
+    color: var(--text-color-dark);
+}
+
 @media (max-width: 768px) {
     .container {
         padding: 0.5rem 1rem;
