@@ -31,13 +31,6 @@ proyecto es una iniciativa educativa y no comercial. Utiliza el Knight edición 
         
         <main>
             <div class="chat-container" id="chatContainer">
-                <div class="welcome-message">
-                    <div class="bot-avatar">🤖</div>
-                    <div class="message-content">
-                        <p>¡Hola! Soy tu tutor de electromagnetismo. Pregúntame sobre cualquier tema referente.</p>
-                        
-                    </div>
-                </div>
             </div>
             
             <div class="input-section">
@@ -49,7 +42,7 @@ proyecto es una iniciativa educativa y no comercial. Utiliza el Knight edición 
                     ></textarea>
                     <button id="sendButton" type="button">
                         <span id="buttonText">Enviar</span>
-                        <span id="buttonLoader" class="loader hidden">⏳</span>
+                        <span id="buttonLoader" class="loader hidden"></span>
                     </button>
                 </div>
                 
@@ -70,15 +63,25 @@ proyecto es una iniciativa educativa y no comercial. Utiliza el Knight edición 
         <footer>
             <div class="status" id="status">
                 <span class="status-indicator"></span>
-                <span class="status-text">Listo para ayudarte</span>
+                <span class="status-text">Esperando clave de acceso...</span>
             </div>
         </footer>
     </div>
+
     <div class="modal hidden" id="errorModal">
         <div class="modal-content">
-            <h3>-Error de Conexión-</h3>
+            <h3>Error de Conexión</h3>
             <p id="errorMessage">Hubo un problema al procesar tu solicitud.</p>
             <button id="closeModal" class="modal-button">Entendido</button>
+        </div>
+    </div>
+    <div class="modal" id="accessModal" style="display: flex;">
+        <div class="modal-content">
+            <h3>Clave de Acceso</h3>
+            <p>Por favor, introduce tu clave para iniciar la sesión.</p>
+            <input type="password" id="accessKeyInput" placeholder="Escribe tu clave aquí..." style="width: 80%; padding: 10px; margin-bottom: 15px; border-radius: 5px; border: 1px solid #ccc;">
+            <p id="accessError" style="color: red; display: none; margin-top: 0;"></p>
+            <button id="submitAccessKey" class="modal-button" style="margin-top: 10px;">Entrar</button>
         </div>
     </div>
     
