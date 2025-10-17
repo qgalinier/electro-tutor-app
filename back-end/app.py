@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 
 #imports
 from flask import Flask, request, jsonify
@@ -20,47 +19,45 @@ logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 #openai
-openai.api_key = os.getenv('OPENAI_API_KEY')
-if not openai.api_key:
+openai_api_key = os.getenv('OPENAI_API_KEY')
+if not openai_api_key:
     logger.error('no se encontró la OPENAI_API_KEY')
 
 #supabase
-SUPABASE_URL = os.getenv('SUPABASE_URL')
-SUPABASE_KEY = os.getenv('SUPABASE_KEY')
+supabase_url = os.getenv('SUPABASE_URL')
+supabase_key = os.getenv('SUPABASE_KEY')
 supabase: Client = None
-if SUPABASE_URL and SUPABASE_KEY:
-    supabase = create_client(SUPABASE_URL, SUPABASE_KEY)
+if supabase_url and supabase_key:
+    try:
+        supabase = create_client(supabase_url, supabase_key)
+        logger.info("Cliente de Supabase inicializado correctamente.")
+    except Exception as e:
+        logger.error(f'Error al inicializar Supabase: {e}')
 else:
-    logger.error('faltan las variables SUPABASE_URL o SUPABASE_KEY')
+    logger.error('Faltan las variables SUPABASE_URL o SUPABASE_KEY.')
+
+#definimos las claves de acceso válidas y a qué grupo pertenecen
+VALID_ACCESS_KEYS = {
+    "localjuarez": "uacj",
+    "utepusers": "utep",
+    "general": "public"
+}
+
+#diccionario para manejar las conversaciones de cada sesión en memoria
+sessions = {}
 
 #prompt del sistema
-SYSTEM_PROMPT = """Eres un tutor experto en Electromagnetismo, basado en el libro "Physics for Scientists and Engineers" de Knight. Tu única misión es guiar a los estudiantes usando el método socrático.
-
-Tu Regla de Oro Absoluta: NUNCA des la respuesta directa a una pregunta conceptual o de resolución de problemas. Tu respuesta SIEMPRE debe ser otra pregunta que guíe al estudiante a pensar.
-
-Directrices de Comportamiento:
-1.  Pregunta, no respondas: Ante una pregunta del estudiante, formula una contra-prepregunta que lo ayude a conectar con conocimientos previos, a descomponer el problema, o a reflexionar sobre algún aspecto clave.
-2.  Mantén un tono de apoyo: Sé paciente, amable y alentador. Usa frases como "¡Excelente pregunta!", "Vamos a pensarlo juntos...", "Estás muy cerca de la idea...".
-3.  Dominio Estricto: Rechaza de forma breve y amable cualquier pregunta que no sea de electromagnetismo. Tu conocimiento se limita a este campo.
-4.  Uso de LaTeX: Incorpora notación matemática en formato LaTeX cuando sea necesario para formular tus preguntas guía.
-
-Ejemplo de tu comportamiento:
-- NO DEBES HACER ESTO:
-  - Usuario: "¿Qué es la Ley de Gauss?"
-  - Tú: "La Ley de Gauss dice que el flujo eléctrico a través de una superficie cerrada es proporcional a la carga encerrada."
-
-- SÍ DEBES HACER ESTO:
-  - Usuario: "¿Qué es la Ley de Gauss?"
-  - Tú: "¡Una ley fundamental! Antes de escribir la ecuación, ¿podrías explicar con tus propias palabras qué es lo que relaciona la Ley de Gauss? ¿Qué dos cantidades físicas conecta?"
-"""
+SYSTEM_PROMPT = """Eres un tutor experto en Electromagnetismo, basado en el libro "Physics for Scientists and Engineers" de Knight. Tu única misión es guiar a los estudiantes usando el método socrático. Tu Regla de Oro Absoluta: NUNCA des la respuesta directa. Tu respuesta SIEMPRE debe ser otra pregunta que guíe al estudiante a pensar."""
 
 #clase del tutor
 class ElectromagnetismTutor:
     def __init__(self):
         self.conversation_history = []
-        self.openai_client = openai.OpenAI(api_key=os.getenv('OPENAI_API_KEY'))
+        self.openai_client = openai.OpenAI(api_key=openai_api_key) if openai_api_key else None
 
     def get_response(self, user_question):
+        if not self.openai_client:
+            return "El servicio de IA no está configurado en el servidor."
         try:
             self.conversation_history.append({'role': 'user', 'content': user_question})
             messages = [{'role': 'system', 'content': SYSTEM_PROMPT}]
@@ -75,22 +72,21 @@ class ElectromagnetismTutor:
             self.conversation_history.append({'role': 'assistant', 'content': assistant_response})
             return assistant_response
         except Exception as e:
-            logger.error(f'error llamando a openai: {str(e)}')
-            return 'hubo un problema con el servicio de IA, intenta de nuevo más tarde'
-
-tutor = ElectromagnetismTutor()
+            logger.error(f'Error llamando a OpenAI: {str(e)}')
+            return 'Hubo un problema con el servicio de IA, intenta de nuevo más tarde.'
 
 #endpoints
-@app.route('/', methods=['GET'])
-@app.route('/api/health', methods=['GET'])
-def health_check():
-    return jsonify({
-        'status': 'healthy',
-        'timestamp': datetime.now().isoformat(),
-        'service': 'electromagnetism-tutor',
-        'openai_configured': bool(openai.api_key),
-        'supabase_configured': bool(supabase)
-    })
+@app.route('/api/validate_key', methods=['POST'])
+def validate_key():
+    #este nuevo endpoint solo verifica si la clave enviada es válida
+    data = request.get_json()
+    key = data.get('access_key')
+    if key and key in VALID_ACCESS_KEYS:
+        logger.info(f"Clave '{key}' validada exitosamente.")
+        return jsonify({'status': 'valid'}), 200
+    else:
+        logger.warning(f"Intento de acceso con clave inválida: '{key}'")
+        return jsonify({'error': 'Clave inválida'}), 401
 
 @app.route('/api/chat', methods=['POST', 'OPTIONS'])
 def chat():
@@ -98,80 +94,115 @@ def chat():
         return '', 204
     try:
         data = request.get_json()
+        session_id = data.get('session_id')
+        access_key = data.get('access_key')
         user_question = data.get('question', '').strip()
-        if not user_question:
-            return jsonify({'error': 'la pregunta no puede estar vacía'}), 400
-        if len(user_question) > 1000:
-            return jsonify({'error': 'la pregunta es demasiado larga'}), 400
-        logger.info(f'pregunta recibida: {user_question[:100]}...')
-        response = tutor.get_response(user_question)
+
+        #validamos que la petición contenga una clave y sesión válidas
+        if not session_id or not access_key or access_key not in VALID_ACCESS_KEYS:
+            return jsonify({'error': 'Acceso no autorizado o sesión inválida'}), 401
+        
+        #si es la primera vez que vemos esta sesión, creamos un nuevo tutor para ella
+        if session_id not in sessions:
+            sessions[session_id] = ElectromagnetismTutor()
+            #también registramos esta nueva sesión en nuestra base de datos
+            if supabase:
+                try:
+                    # Usamos el session_id generado por el cliente como 'id'
+                    supabase.table('sessions').insert({
+                        'id': session_id,
+                        'access_key': VALID_ACCESS_KEYS[access_key]
+                    }).execute()
+                    logger.info(f"Nueva sesión {session_id} (grupo: {VALID_ACCESS_KEYS[access_key]}) registrada en DB.")
+                except Exception as e:
+                    logger.error(f"No se pudo registrar la nueva sesión en Supabase: {e}")
+            logger.info(f"Nueva conversación iniciada para sesión: {session_id}")
+        
+        #usamos el tutor que corresponde a esta sesión
+        current_tutor = sessions[session_id]
+        response = current_tutor.get_response(user_question)
+        
         return jsonify({
             'response': response,
             'timestamp': datetime.now().isoformat()
         })
     except Exception as e:
-        logger.error(f'error en endpoint /api/chat: {str(e)}')
-        return jsonify({'error': 'error interno del servidor'}), 500
+        logger.error(f'Error en endpoint /api/chat: {str(e)}')
+        return jsonify({'error': 'Error interno del servidor'}), 500
 
 @app.route('/api/feedback', methods=['POST'])
 def handle_feedback():
     if not supabase:
-        logger.error('se intentó guardar feedback pero la conexión con supabase no está activa')
-        return jsonify({'error': 'la conexión con supabase no está configurada en el servidor'}), 503
+        return jsonify({'error': 'La conexión con la base de datos no está configurada.'}), 503
     try:
         data = request.get_json()
-        if not all(k in data for k in ['question', 'response', 'rating']):
-            return jsonify({'error': 'faltan datos en la solicitud'}), 400
+        
+        #aquí podrías añadir la lógica para clasificar el tópico con el LLM
+        topic = 'desconocido' 
+
         feedback_data = {
             'rating': int(data['rating']),
-            'comment': data.get('comment', '').strip(),
-            'topic': data.get('topic', 'desconocido').strip(),
-            'question': data['question'].strip(),
-            'response': data['response'].strip()
+            'comment': data.get('comment', ''),
+            'topic': topic,
+            'question': data['question'],
+            'response': data['response'],
+            'session_id': data.get('session_id'), #guardamos el id de sesión
+            'access_key': VALID_ACCESS_KEYS.get(data.get('access_key')) #guardamos el grupo (uacj, utep, etc)
         }
         
-        #el campo timestamp se puede generar automáticamente en supabase
-        #si configuras un valor por defecto como now() en la tabla
-        #si no, puedes añadirlo aquí
-        #feedback_data['timestamp'] = datetime.now().isoformat()
+        response_obj, count = supabase.table('feedback').insert(feedback_data).execute()
         
-        response_obj = supabase.table('feedback').insert(feedback_data).execute()
-        
-        if hasattr(response_obj, 'error') and response_obj.error:
-            raise Exception(f"supabase error: {response_obj.error}")
+        #manejamos la respuesta de la librería para v2
+        if count is None and isinstance(response_obj, list) and len(response_obj) > 0:
+             pass # Inserción exitosa en v2
+        elif isinstance(count, dict) and 'error' in count:
+             raise Exception(f"Supabase error: {count['error']}")
 
-        logger.info(f'feedback guardado en supabase (rating: {data["rating"]})')
-        return jsonify({'status': 'success', 'message': 'feedback recibido'}), 201
-    except ValueError:
-        return jsonify({'error': 'el rating debe ser un número entero'}), 400
+
+        logger.info(f'Feedback guardado en Supabase para sesión {data.get("session_id")}')
+        return jsonify({'status': 'success', 'message': 'Feedback recibido'}), 201
     except Exception as e:
-        logger.error(f'error en el endpoint /api/feedback: {str(e)}')
-        return jsonify({'error': 'error interno al guardar el feedback'}), 500
+        logger.error(f'Error en el endpoint /api/feedback: {str(e)}')
+        return jsonify({'error': 'Error interno al guardar el feedback'}), 500
+
+@app.route('/api/health', methods=['GET'])
+def health_check():
+    return jsonify({
+        'status': 'healthy',
+        'timestamp': datetime.now().isoformat(),
+        'openai_configured': bool(openai_api_key),
+        'supabase_configured': bool(supabase)
+    })
 
 @app.route('/api/reset', methods=['POST'])
 def reset_conversation():
-    global tutor
-    tutor.conversation_history = []
-    logger.info('la conversación ha sido reiniciada')
-    return jsonify({'message': 'conversación reiniciada'})
+    data = request.get_json()
+    session_id = data.get('session_id')
+    if session_id and session_id in sessions:
+        del sessions[session_id]
+        logger.info(f'Sesión {session_id} ha sido reiniciada.')
+        return jsonify({'message': f'Sesión {session_id} reiniciada.'})
+    return jsonify({'error': 'Sesión no encontrada o no proporcionada.'}), 404
+
 
 @app.errorhandler(404)
 def not_found(error):
-    return jsonify({'error': 'endpoint no encontrado'}), 404
+    return jsonify({'error': 'Endpoint no encontrado'}), 404
 
 @app.errorhandler(405)
 def method_not_allowed(error):
-    return jsonify({'error': 'método no permitido para este endpoint'}), 405
+    return jsonify({'error': 'Método no permitido para este endpoint'}), 405
 
 @app.errorhandler(500)
 def internal_error(error):
-    return jsonify({'error': 'error interno del servidor'}), 500
+    return jsonify({'error': 'Error interno del servidor'}), 500
 
 if __name__ == '__main__':
     print('*' * 50)
-    print('iniciando servidor del tutor de electromagnetismo')
-    print(f'   estado de openai: {"configurado" if openai.api_key else "no configurado"}')
-    print(f'   estado de supabase: {"configurado" if supabase else "no configurado"}')
-    print('   servidor escuchando en: http://127.0.0.1:5000')
+    print('Iniciando servidor del Tutor de Electromagnetismo')
+    print(f'   Estado de OpenAI: {"CONFIGURADO" if openai_api_key else "NO CONFIGURADO"}')
+    print(f'   Estado de Supabase: {"CONFIGURADO" if supabase else "NO CONFIGURADO"}')
+    print('   Servidor escuchando en: http://127.0.0.1:5000')
     print('*' * 50)
     app.run(debug=True, host='127.0.0.1', port=5000)
+
