@@ -63,9 +63,9 @@ class ElectromagnetismTutor:
             messages = [{'role': 'system', 'content': SYSTEM_PROMPT}]
             messages.extend(self.conversation_history[-20:])
             response = self.openai_client.chat.completions.create(
-                model='ft:gpt-4o-2024-08-06:personal:tutor-electro-v1:COp6sgDQ',
+                model='ft:gpt-4.1-mini-2025-04-14:personal:physics-tutor:CY4arhAN',
                 messages=messages,
-                max_tokens=1500,
+                max_tokens=3000,
                 temperature=0.9
             )
             assistant_response = response.choices[0].message.content
